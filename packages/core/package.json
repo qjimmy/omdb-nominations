@@ -1,0 +1,16 @@
+{
+  "name": "@shopify/core",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "license": "MIT",
+  "dependencies": {
+    "redux": "^4.1.0",
+    "redux-devtools-extension": "^2.13.9",
+    "redux-observable": "^1.2.0",
+    "reselect": "^4.0.0",
+    "rxjs": "^6.6.6"
+  },
+  "devDependencies": {
+    "@types/webpack-env": "^1.16.0"
+  }
+}
