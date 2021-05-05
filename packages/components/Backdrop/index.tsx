@@ -13,7 +13,7 @@ export const Backdrop = ({ ...props }: BackdropProps) => (
     top={0}
     left={0}
     width='100vw'
-    height='100vh'
+    height='100%'
     zIndex='0'
     style={{
       backdropFilter: 'blur(10px)',

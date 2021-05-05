@@ -61,7 +61,11 @@ export const search = (
     }
 
     case SEARCH_RESULTS_FETCH_CANCEL: {
-      return { ...state, loading: false, status: action.status };
+      return {
+        ...state,
+        loading: false,
+        status: action.status || state.status,
+      };
     }
 
     default: {

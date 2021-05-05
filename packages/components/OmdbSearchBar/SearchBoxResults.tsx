@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flex, Box, Text, FlexProps, Button } from '@chakra-ui/react';
+import { Flex, Box, Text, FlexProps, Button, Badge } from '@chakra-ui/react';
 import Image from 'next/image';
 import { FcRemoveImage } from 'react-icons/fc';
 import { NominationService } from '@shopify/core/services/nominationService';
@@ -35,10 +35,13 @@ export const SearchBoxResults: React.FC<SearchBoxResultsProps> = ({
             position='relative'
             maxWidth='100%'
             height='120px'
+            cursor={!isAlreadyNominated && 'pointer'}
             {...props}
             onClick={() => {
-              props.onClick(null);
-              NominationService.nominate(searchResult);
+              if (!isAlreadyNominated) {
+                props.onClick(null);
+                NominationService.nominate(searchResult);
+              }
             }}
             _hover={
               isAlreadyNominated
@@ -50,6 +53,7 @@ export const SearchBoxResults: React.FC<SearchBoxResultsProps> = ({
           >
             {isAlreadyNominated && (
               <Flex
+                flexDir='column'
                 position='absolute'
                 top='50%'
                 left='50%'
@@ -58,16 +62,27 @@ export const SearchBoxResults: React.FC<SearchBoxResultsProps> = ({
                 alignItems='center'
                 opacity='1'
                 transform='translate(-50%, -50%)'
+                zIndex='4'
               >
                 <Text
                   p='2'
                   borderRadius='10px'
                   opacity='1'
-                  color='white'
-                  bgGradient='linear-gradient(to left, #5C258D, #4389A2)'
+                  color='black'
+                  // bgGradient='linear-gradient(to left, #5C258D, #4389A2)'
                 >
-                  You already nominated this movie 🤨...
+                  You already nominated this movie
                 </Text>
+
+                <Badge
+                  mr='1'
+                  cursor='pointer'
+                  color='white'
+                  bgGradient='linear(to left, #FF416C, #FF4B2B)'
+                  onClick={() => NominationService.remove(searchResult.imdbID)}
+                >
+                  Remove
+                </Badge>
               </Flex>
             )}
 
@@ -109,16 +124,9 @@ export const SearchBoxResults: React.FC<SearchBoxResultsProps> = ({
 
               <Text>{searchResult.Year}</Text>
 
-              <Box
-                mt={2}
-                px='10px'
-                borderRadius='25px'
-                bgGradient={PillGradient(searchResult.Type)}
-                width='auto'
-                color='white'
-              >
+              <Badge color='white' bgGradient={PillGradient(searchResult.Type)}>
                 {searchResult.Type}
-              </Box>
+              </Badge>
             </Flex>
           </Flex>
         );

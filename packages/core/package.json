@@ -4,6 +4,7 @@
   "main": "index.ts",
   "license": "MIT",
   "dependencies": {
+    "graphql": "^15.5.0",
     "redux": "^4.1.0",
     "redux-devtools-extension": "^2.13.9",
     "redux-observable": "^1.2.0",

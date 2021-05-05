@@ -29,7 +29,7 @@ export class SearchBarResultError {
 
 export class CancelSearchResultFetch {
   readonly type = SEARCH_RESULTS_FETCH_CANCEL;
-  constructor(readonly status: SearchStatus | '') {}
+  constructor(readonly status?: SearchStatus | '') {}
 }
 
 export type SearchActions =

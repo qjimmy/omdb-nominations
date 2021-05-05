@@ -1,27 +1,29 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Box, Flex, Input, InputProps, Spinner, Text } from '@chakra-ui/react';
-import { Backdrop } from '@shopify/components';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { SearchBarService } from '@shopify/core';
 import { useSelector } from 'react-redux';
-import { getNominationState, getSearchState } from '../../core/redux/selectors';
+import { getSearchState } from '../../core/redux/selectors';
 import { SearchStatus } from '@shopify/types';
 import { SearchResultsWrapper } from './SearchResultsWrapper';
 import { SearchBoxResults } from './SearchBoxResults';
 
-interface OmdbSearchbarProps extends InputProps {}
+interface OmdbSearchbarProps extends InputProps {
+  focused: boolean;
+  setFocused: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-export const OmdbSearchbar: React.FC<OmdbSearchbarProps> = ({ ...props }) => {
+export const OmdbSearchbar: React.FC<OmdbSearchbarProps> = ({
+  focused,
+  setFocused,
+  ...props
+}) => {
   const searchBox = useRef(null);
 
   const search = useSelector(getSearchState);
 
-  const [focused, setFocused] = useState(false);
-
   return (
     <Box {...props}>
-      {focused && <Backdrop onClick={() => setFocused(false)} />}
-
       <Flex position='relative' background='white' borderRadius='0.375rem'>
         <Flex
           placeItems='center'
@@ -39,11 +41,14 @@ export const OmdbSearchbar: React.FC<OmdbSearchbarProps> = ({ ...props }) => {
           background='white'
           color='black'
           width='100%'
+          placeholder='"Demon Slayer the Movie: Mugen Train"'
+          _placeholder={{
+            color: 'black',
+          }}
           ref={searchBox}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
             SearchBarService.search(event.target.value)
           }
-          onFocus={() => setFocused(true)}
         />
       </Flex>
 
@@ -95,7 +100,7 @@ export const OmdbSearchbar: React.FC<OmdbSearchbarProps> = ({ ...props }) => {
             </SearchResultsWrapper>
           )}
 
-          {search.loading && (
+          {search.loading && search.status === SearchStatus.Fetching && (
             <SearchResultsWrapper
               display='flex'
               justifyContent='center'

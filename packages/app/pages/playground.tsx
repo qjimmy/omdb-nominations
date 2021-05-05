@@ -6,7 +6,7 @@ import type {
 } from 'next';
 import Head from 'next/head';
 import Link from 'next/link';
-import { Flex } from '@chakra-ui/react';
+import { Flex, useDisclosure, Button } from '@chakra-ui/react';
 import * as Component from '@shopify/components';
 
 const Home: NextPage = () => {
@@ -20,9 +20,13 @@ const Home: NextPage = () => {
         />
         <link rel='icon' href='/favicon.ico' />
       </Head>
+
       <div>playground</div>
       <Link href='/'>Home</Link>
-      <Flex justifyContent='center' width='100%'></Flex>
+
+      <Flex justifyContent='center' width='100%'>
+        <Component.NominationCard width='500px' height='600px' />
+      </Flex>
     </>
   );
 };

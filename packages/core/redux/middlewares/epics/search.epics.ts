@@ -1,4 +1,4 @@
-import { of, from, Observable } from 'rxjs';
+import { of, from, Observable, race } from 'rxjs';
 import { combineEpics, Epic, StateObservable } from 'redux-observable';
 import { ofType } from 'redux-observable';
 import { AppState, IOmdbSearchResults, SearchStatus } from '@shopify/types';
@@ -22,6 +22,7 @@ import {
   switchMap,
   catchError,
   pluck,
+  takeUntil,
 } from 'rxjs/operators';
 import { HttpService } from '../../../services';
 
@@ -38,32 +39,39 @@ const searchQueryEpic: Epic = (
     // Avoid sending requests if empty query
     filter(() => store$.value.search.query.length > 2),
     switchMap((_action: SearchActions) =>
-      from(
-        HttpService.get<{ searchResults: IOmdbSearchResults }>(
-          `/api/get-search-results`,
-          {
-            query: { query: store$.value.search.query },
-          }
-        )
-      ).pipe(
-        map(
-          ({ searchResults }) =>
-            new SearchBarResultSuccess({
-              ...new OmdbSearchResults(searchResults),
-            })
-        ),
-        catchError((error) => {
-          alert({
-            status: 'error',
-            title: 'Error',
-            description:
-              error.message + ' Please try again or be more specific',
-            position: 'top-left',
-            isClosable: true,
-          });
+      race(
+        from(
+          HttpService.get<{ searchResults: IOmdbSearchResults }>(
+            `/api/get-search-results`,
+            {
+              query: { query: store$.value.search.query },
+            }
+          )
+        ).pipe(
+          map(
+            ({ searchResults }) =>
+              new SearchBarResultSuccess({
+                ...new OmdbSearchResults(searchResults),
+              })
+          ),
+          takeUntil(action$.pipe(ofType(SEARCH_RESULTS_FETCHING))),
+          catchError((error) => {
+            alert({
+              status: 'error',
+              title: 'Error',
+              description:
+                error.message + ' Please try again or be more specific',
+              position: 'top-left',
+              isClosable: true,
+            });
 
-          return of(new SearchBarResultError({ ...error }));
-        })
+            return of(new SearchBarResultError({ ...error }));
+          })
+        ),
+        action$.pipe(
+          ofType(SEARCH_BAR_QUERY),
+          switchMap(() => of(new CancelSearchResultFetch()))
+        )
       )
     )
   );
