@@ -10,13 +10,14 @@ import { AppState } from '@shopify/types';
 import { AppActions } from '@shopify/core/redux/actions';
 import { searchEpics } from './search.epics';
 import { nominationEpics } from './nominations.epics';
+import { rankingsEpic } from './rankings.epics';
 
 export const rootEpic: Epic<AppActions, AppActions, AppState, any> = (
   action$: ActionsObservable<AppActions>,
   state$: StateObservable<AppState>,
   dependencies
 ) =>
-  combineEpics(searchEpics, nominationEpics)(
+  combineEpics(searchEpics, nominationEpics, rankingsEpic)(
     action$,
     state$,
     dependencies

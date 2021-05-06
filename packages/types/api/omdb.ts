@@ -1,9 +1,14 @@
+import { MAX_NOMINATIONS } from '@shopify/utils';
 export interface MovieMetadata {
   Title: string;
   Year: string | number;
   imdbID: string;
   Type: string;
   Poster: string;
+}
+
+export interface MovieRanking extends MovieMetadata {
+  votes: number;
 }
 
 export interface IOmdbSearchResults {
@@ -33,7 +38,7 @@ export class OmdbSearchResults {
   }: IOmdbSearchResults) {
     this.Response = Response;
     this.Search = OmdbSearchResults.checkForUniqueness(Search)
-      .slice(0, 5)
+      .slice(0, MAX_NOMINATIONS)
       .map((movie: MovieMetadata) => ({
         ...movie,
         Year: parseInt(movie.Year as string),

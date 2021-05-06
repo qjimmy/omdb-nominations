@@ -1,23 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Flex, Grid } from '@chakra-ui/react';
 import Head from 'next/head';
-import { GetStaticProps, GetStaticPropsContext } from 'next';
-import { Backdrop, NominationCard, OmdbSearchbar } from '@shopify/components';
+import { GetStaticProps, GetStaticPropsContext, NextPage } from 'next';
+import {
+  Backdrop,
+  NominationCard,
+  OmdbSearchbar,
+  RankingsCard,
+} from '@shopify/components';
 import { useRouter } from 'next/router';
 import { store } from '@shopify/core/redux';
 import { SetNomination } from '@shopify/core/redux/actions';
 import { LocalStorageService } from '@shopify/core/services';
-import { NominationState } from '@shopify/types';
+import { MovieMetadata, MovieRanking } from '@shopify/types';
+import { admin } from '@shopify/utils/server';
+import { Collections, MAX_NOMINATIONS } from '@shopify/utils';
 
-export default function Home() {
+const Homepage: NextPage<{ rankings: Array<MovieRanking> }> = ({
+  rankings,
+}) => {
   const [focused, setFocused] = useState<boolean>(false);
   const { isFallback } = useRouter();
 
-  console.log(isFallback);
-
   useEffect(() => {
     store.dispatch(
-      new SetNomination(LocalStorageService.getNominations<NominationState>())
+      new SetNomination(
+        LocalStorageService.getNominations<{ [key: string]: MovieMetadata }>()
+      )
     );
   }, []);
 
@@ -68,7 +77,9 @@ export default function Home() {
             height='750px'
             mb='50px'
           />
-          <NominationCard
+          <RankingsCard
+            loading={isFallback}
+            rankings={rankings}
             maxWidth={[, '555px', , '70%']}
             width={['100%', '90%', '80%']}
             height='750px'
@@ -78,13 +89,28 @@ export default function Home() {
       </Flex>
     </>
   );
-}
+};
+
+export default Homepage;
 
 export const getStaticProps: GetStaticProps = async (
   _ctx: GetStaticPropsContext
 ) => {
+  const rankingsCollection = await admin
+    .firestore()
+    .collection(Collections.Rankings)
+    .orderBy('votes', 'desc')
+    .limit(MAX_NOMINATIONS)
+    .get();
+
+  const rankings = rankingsCollection.docs.map((nominee) => ({
+    ...nominee.data(),
+  }));
+
   return {
-    props: {},
+    props: {
+      rankings,
+    },
     revalidate: 3,
   };
 };

@@ -2,6 +2,7 @@ const withTM = require('next-transpile-modules')([
   '@shopify/types',
   '@shopify/core',
   '@shopify/components',
+  '@shopify/utils',
 ]);
 
 module.exports = withTM({

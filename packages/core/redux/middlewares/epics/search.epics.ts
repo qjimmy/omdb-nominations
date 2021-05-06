@@ -61,7 +61,7 @@ const searchQueryEpic: Epic = (
               title: 'Error',
               description:
                 error.message + ' Please try again or be more specific',
-              position: 'top-left',
+              position: 'top',
               isClosable: true,
             });
 
@@ -85,7 +85,7 @@ const debounceSearchQueryEpic: Epic = (
     pluck('query'),
     tap(() => alert.closeAll()),
     filter((query: string) => query.length > 2),
-    debounceTime(800),
+    debounceTime(500),
     switchMap(() => of(new SearchBarFetchingResults()))
   );
 

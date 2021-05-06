@@ -4,7 +4,7 @@ import { classToJsObject, rootEpic } from './middlewares';
 import { createEpicMiddleware } from 'redux-observable';
 import { AppActions } from './actions';
 import { AppState } from '@shopify/types';
-import { search, nominations } from './reducers';
+import { search, nominations, rankings } from './reducers';
 import { BehaviorSubject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 
@@ -21,7 +21,7 @@ export const store: Store<AppState, AppActions> = createStore<
   any,
   any
 >(
-  combineReducers({ search, nominations }),
+  combineReducers({ search, nominations, rankings }),
   composeWithDevTools(applyMiddleware(epicMiddleware, classToJsObject))
 );
 

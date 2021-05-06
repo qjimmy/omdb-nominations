@@ -1,17 +1,20 @@
 import { AppState } from '@shopify/types';
-import { Observable, of } from 'rxjs';
+import { from, Observable, of } from 'rxjs';
 import { Epic, StateObservable, ofType, combineEpics } from 'redux-observable';
 import {
   AddNomination,
+  ClearNominationError,
+  ClearNominations,
+  ClearNominationsSuccess,
+  CLEAR_NOMINATIONS,
   NOMINATE,
   RemoveNomination,
   REMOVE_NOMINATION,
-  SetNomination,
-  SET_NOMINATION,
 } from '@shopify/core/redux/actions';
-import { filter, switchMap, tap } from 'rxjs/operators';
+import { catchError, filter, map, switchMap, tap } from 'rxjs/operators';
 import { createStandaloneToast } from '@chakra-ui/react';
-import { LocalStorageService } from '@shopify/core/services';
+import { HttpService, LocalStorageService } from '@shopify/core/services';
+import { MAX_NOMINATIONS } from '@shopify/utils';
 
 const alert = createStandaloneToast();
 
@@ -21,39 +24,72 @@ const addNominationEpic: Epic = (
 ): Observable<any> =>
   action$.pipe(
     ofType(NOMINATE),
-    filter(() => Object.keys(store$.value.nominations).length <= 5),
+    filter(
+      () =>
+        Object.keys(store$.value.nominations.nominees).length <= MAX_NOMINATIONS
+    ),
     tap((action) => {
       LocalStorageService.setNominations({
-        ...store$.value.nominations,
+        ...store$.value.nominations.nominees,
         [action.payload.imdbID]: action.payload,
       });
       alert.closeAll();
-      alert({
-        status: 'success',
-        title: `${action.payload.Title} Nominated!`,
-        position: 'top-left',
-        isClosable: true,
-      });
+      alert(
+        Object.keys(store$.value.nominations.nominees).length ===
+          MAX_NOMINATIONS
+          ? {
+              status: 'success',
+              title: 'Maximum Reached 🎉',
+              description: `Congratulations! You've nominated the maximum of 5 movies/series!`,
+              position: 'top',
+              isClosable: true,
+            }
+          : {
+              status: 'success',
+              title: `${action.payload.Title} Nominated!`,
+              position: 'top',
+              isClosable: true,
+            }
+      );
     }),
-    switchMap(() =>
-      of({ type: '[Nomination] Alert Nomination Success' }).pipe()
+    switchMap((action) =>
+      from(
+        HttpService.put('/api/nominations/add', {
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...action.payload }),
+        })
+      ).pipe(
+        map(() => ({ type: '[Nomination] Alert Nomination Success' })),
+        catchError((error) =>
+          of({
+            type: '[Nomination] Add Nomination Error',
+            payload: { ...error },
+          })
+        )
+      )
     )
   );
 
 const clearNominationsEpic: Epic = (
-  action$: Observable<SetNomination>,
-  _store$: StateObservable<AppState>
+  action$: Observable<ClearNominations>,
+  store$: StateObservable<AppState>
 ): Observable<any> =>
   action$.pipe(
-    ofType(SET_NOMINATION),
-    filter((action) => !Object.keys(action.nomination).length),
+    ofType(CLEAR_NOMINATIONS),
+    filter(() => !!Object.keys(store$.value.nominations.nominees).length),
     tap(() => {
       LocalStorageService.setNominations({});
     }),
     switchMap(() =>
-      of({
-        type: '[Nomination] Cleared Nominations',
-      })
+      from(
+        HttpService.put('/api/nominations/clear', {
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(Object.keys(store$.value.nominations.nominees)),
+        })
+      ).pipe(
+        map(() => new ClearNominationsSuccess()),
+        catchError((error) => of(new ClearNominationError(error)))
+      )
     )
   );
 
@@ -64,14 +100,27 @@ const removeNominationEpic: Epic = (
   action$.pipe(
     ofType(REMOVE_NOMINATION),
     tap((action: RemoveNomination) => {
-      const tempNominations = store$.value.nominations;
+      const tempNominations = store$.value.nominations.nominees;
       delete tempNominations[action.movieId];
       LocalStorageService.setNominations({ ...tempNominations });
     }),
-    switchMap(() =>
-      of({
-        type: '[Nomination] Removed Nomination',
-      })
+    switchMap(({ movieId }: RemoveNomination) =>
+      from(
+        HttpService.put('/api/nominations/remove', {
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imdbID: movieId }),
+        })
+      ).pipe(
+        map(() => ({
+          type: '[Nomination] Removed Nomination',
+        })),
+        catchError((error) =>
+          of({
+            type: '[Nomination] Removed Nomination Error',
+            payload: { ...error },
+          })
+        )
+      )
     )
   );
 

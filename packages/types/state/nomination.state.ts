@@ -1,5 +1,9 @@
 import { MovieMetadata } from '../api';
 
 export interface NominationState {
-  [key: string]: MovieMetadata;
+  nominees: {
+    [key: string]: MovieMetadata;
+  };
+  loading: boolean;
+  error: any;
 }

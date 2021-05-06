@@ -43,7 +43,7 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
             variant='solid'
             onClick={() => {
               onClose();
-              NominationService.setNominationState({});
+              NominationService.clearNominations();
             }}
             _hover={{
               background: 'red.600',

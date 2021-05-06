@@ -3,18 +3,36 @@ import type { AppState, MovieMetadata, NominationState } from '@shopify/types';
 
 export const getNominationList: OutputSelector<
   AppState,
-  Array<MovieMetadata>,
-  (res: NominationState) => Array<MovieMetadata>
-> = createSelector<AppState, NominationState, Array<MovieMetadata>>(
-  (state) => state.nominations,
-  (nominations) => Object.values(nominations)
+  MovieMetadata[],
+  (res: { [key: string]: MovieMetadata }) => MovieMetadata[]
+> = createSelector<
+  AppState,
+  {
+    [key: string]: MovieMetadata;
+  },
+  MovieMetadata[]
+>(
+  (state) => state.nominations.nominees,
+  (nominees) => Object.values(nominees)
 );
 
 export const getNominationState: OutputSelector<
   AppState,
+  {
+    [key: string]: MovieMetadata;
+  },
+  (
+    res: NominationState
+  ) => {
+    [key: string]: MovieMetadata;
+  }
+> = createSelector<
+  AppState,
   NominationState,
-  (res: NominationState) => NominationState
-> = createSelector<AppState, NominationState, NominationState>(
-  (state) => state.nominations,
-  (nominations) => nominations
+  {
+    [key: string]: MovieMetadata;
+  }
+>(
+  (state: AppState) => state.nominations,
+  (nominations) => nominations.nominees
 );

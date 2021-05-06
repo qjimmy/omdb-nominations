@@ -1,12 +1,19 @@
 import { NominationState } from '@shopify/types/state/nomination.state';
 import {
+  CLEAR_NOMINATIONS,
+  CLEAR_NOMINATIONS_ERROR,
+  CLEAR_NOMINATIONS_SUCCESS,
   NOMINATE,
   NominationActions,
   REMOVE_NOMINATION,
   SET_NOMINATION,
 } from '../actions';
 
-const initialState = {};
+const initialState = {
+  loading: false,
+  error: null,
+  nominees: {},
+};
 
 export const nominations = (
   state: NominationState = initialState,
@@ -16,22 +23,46 @@ export const nominations = (
     case NOMINATE: {
       return {
         ...state,
-        [action.payload.imdbID]: action.payload,
+        nominees: {
+          ...state.nominees,
+          [action.payload.imdbID]: action.payload,
+        },
       };
     }
 
     case REMOVE_NOMINATION: {
-      const temp = state;
+      const temp = state.nominees;
       delete temp[action.movieId];
       return {
-        ...temp,
+        ...state,
+        nominees: { ...temp },
       };
     }
 
     case SET_NOMINATION: {
       return {
-        ...action.nomination,
+        ...state,
+        nominees: action.nomination,
       };
+    }
+
+    case CLEAR_NOMINATIONS: {
+      return {
+        ...state,
+        loading: true,
+      };
+    }
+
+    case CLEAR_NOMINATIONS_SUCCESS: {
+      return {
+        ...state,
+        loading: false,
+        nominees: {},
+      };
+    }
+
+    case CLEAR_NOMINATIONS_ERROR: {
+      return { ...state, loading: false, error: action.payload };
     }
 
     default: {

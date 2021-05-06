@@ -1,8 +1,16 @@
 import React from 'react';
-import { Flex, Box, Text, FlexProps, Button, Badge } from '@chakra-ui/react';
+import {
+  Flex,
+  Box,
+  Text,
+  FlexProps,
+  Button,
+  Badge,
+  useToast,
+} from '@chakra-ui/react';
 import Image from 'next/image';
 import { FcRemoveImage } from 'react-icons/fc';
-import { NominationService } from '@shopify/core/services/nominationService';
+import { NominationService } from '@shopify/core/services';
 import { getNominationState } from '@shopify/core/redux/selectors/nominations.selectors';
 import { useSelector } from 'react-redux';
 
@@ -20,7 +28,10 @@ export const SearchBoxResults: React.FC<SearchBoxResultsProps> = ({
   searchResults,
   ...props
 }) => {
+  const alert = useToast();
+
   const nominations = useSelector(getNominationState);
+  const isMaxNominations = Object.keys(nominations).length === 5;
 
   return (
     <>
@@ -40,7 +51,15 @@ export const SearchBoxResults: React.FC<SearchBoxResultsProps> = ({
             onClick={() => {
               if (!isAlreadyNominated) {
                 props.onClick(null);
-                NominationService.nominate(searchResult);
+                !isMaxNominations
+                  ? NominationService.nominate(searchResult)
+                  : alert({
+                      status: 'error',
+                      title: 'Maximum of 5 Nominations only!',
+                      description: 'You can only nominate 5 movies at most.',
+                      position: 'top',
+                      isClosable: true,
+                    });
               }
             }}
             _hover={

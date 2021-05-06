@@ -38,7 +38,7 @@ export const NominationCard = ({ children, ...props }: CardProps) => {
           gridTemplateColumns='1fr 3fr'
           alignItems='center'
         >
-          <Flex justifyContent='center'>
+          <Flex width='85px' justifyContent='center'>
             <Image height='50px' width='50px' src='/nomination.svg' />
           </Flex>
           <Text fontWeight='bold'>My Nominations</Text>

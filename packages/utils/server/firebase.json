@@ -1,0 +1,9 @@
+{
+  "apiKey": "AIzaSyAbszYDTaA5T7-Y85Z9GMJy6nw67ecxpQ0",
+  "authDomain": "omdb-nominations.firebaseapp.com",
+  "projectId": "omdb-nominations",
+  "storageBucket": "omdb-nominations.appspot.com",
+  "messagingSenderId": "96095871621",
+  "appId": "1:96095871621:web:f0f0d8d3a21276207b3fec",
+  "clientEmail": "firebase-adminsdk-uihc4@omdb-nominations.iam.gserviceaccount.com"
+}

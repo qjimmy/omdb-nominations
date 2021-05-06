@@ -1,0 +1,9 @@
+{
+  "name": "@shopify/utils",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "license": "MIT",
+  "dependencies": {
+    "firebase-admin": "^9.7.0"
+  }
+}
