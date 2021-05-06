@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Flex, Grid } from '@chakra-ui/react';
+import { Box, Flex, Grid, Text } from '@chakra-ui/react';
 import Head from 'next/head';
 import { GetStaticProps, GetStaticPropsContext, NextPage } from 'next';
 import {
@@ -35,58 +35,60 @@ const Homepage: NextPage<{ rankings: Array<MovieRanking> }> = ({
       <Head>
         <title>OMDB Nominations</title>
         <meta
-          name='Nominate your favorite movies and make a change!'
+          name='OMDB Nominations. Nominate your favorite movies and make a change.'
           content='Created by QJ'
         />
         <link rel='icon' href='/favicon.ico' />
       </Head>
 
-      <Flex
-        flexDir='column'
-        position='relative'
-        justifyContent='center'
-        alignItems='center'
-        height='100%'
-        width='100%'
-      >
-        {focused && <Backdrop zIndex='1' onClick={() => setFocused(false)} />}
-        <Box width='100%' height='100px' mb='50px'>
-          <OmdbSearchbar
-            position='absolute'
-            top='10'
-            left='50%'
-            transform='translate(-50%)'
-            zIndex='1'
-            width={['100%', '80%', '65%']}
-            focused={focused}
-            setFocused={setFocused}
-            onFocus={() => setFocused(true)}
-          />
-        </Box>
-
-        <Grid
-          flex='1'
+      <main>
+        <Flex
+          flexDir='column'
+          position='relative'
+          justifyContent='center'
+          alignItems='center'
+          height='100%'
           width='100%'
-          placeItems='center'
-          gridTemplateColumns='repeat(auto-fit, minmax(400px, 1fr))'
-          gap={['3', '2', '1']}
         >
-          <NominationCard
-            maxWidth={[, '555px', , '70%']}
-            width={['100%', '90%', '80%']}
-            height='750px'
-            mb='50px'
-          />
-          <RankingsCard
-            loading={isFallback}
-            rankings={rankings}
-            maxWidth={[, '555px', , '70%']}
-            width={['100%', '90%', '80%']}
-            height='750px'
-            mb='50px'
-          />
-        </Grid>
-      </Flex>
+          {focused && <Backdrop zIndex='1' onClick={() => setFocused(false)} />}
+          <Box width='100%' height='100px' mb='50px'>
+            <OmdbSearchbar
+              position='absolute'
+              top='10'
+              left='50%'
+              transform='translate(-50%)'
+              zIndex='1'
+              width={['100%', '80%', '65%']}
+              focused={focused}
+              setFocused={setFocused}
+              onFocus={() => setFocused(true)}
+            />
+          </Box>
+
+          <Grid
+            flex='1'
+            width='100%'
+            placeItems='center'
+            gridTemplateColumns='repeat(auto-fit, minmax(400px, 1fr))'
+            gap={['3', '2', '1']}
+          >
+            <NominationCard
+              maxWidth={[, '555px', , '70%']}
+              width={['100%', '90%', '80%']}
+              height='750px'
+              mb='50px'
+            />
+            <RankingsCard
+              loading={isFallback}
+              rankings={rankings}
+              maxWidth={[, '555px', , '70%']}
+              width={['100%', '90%', '80%']}
+              height='750px'
+              mb='50px'
+            />
+          </Grid>
+        </Flex>
+      </main>
     </>
   );
 };

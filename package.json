@@ -7,6 +7,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "yarn workspace @shopify/app dev"
+    "dev": "yarn workspace @shopify/app dev",
+    "build": "yarn workspace @shopify/app build"
   }
 }

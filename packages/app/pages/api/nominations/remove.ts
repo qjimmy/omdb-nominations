@@ -12,8 +12,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const { imdbID } = req.body;
   const rankingsRef = admin.firestore().collection(Collections.Rankings);
 
-  console.log(req.body);
-
   try {
     const nomineeRef = rankingsRef.doc(imdbID);
     const decrement = admin.firestore.FieldValue.increment(-1);
